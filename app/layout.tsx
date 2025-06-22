@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import {  Fira_Mono  } from "next/font/google";
+import { Fira_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/app/components/Navbar";
+import Navbar from "@/components/Navbar";
 import { CivicAuthProvider } from "@civic/auth/nextjs";
 
+import type { ReactNode } from "react";
+
+import { ReactQueryProvider } from "@/components/ui/ReactQueryProvider";
+import { WalletProvider } from "@/components/ui/WalletProvider";
+import { Toast } from "@/components/ui/toast";
+import { WrongNetworkAlert } from "@/components/ui/WrongNetworkAlert";
+
 const firaMono = Fira_Mono({
-    weight: ["400", "500", "700"],
+  weight: ["400", "500", "700"],
   variable: "--font-fira-mono",
   subsets: ["latin"],
 });
@@ -25,8 +32,8 @@ export default function RootLayout({
       <body
         className={`${firaMono.variable} antialiased`}>
         <CivicAuthProvider>
-          <Navbar/>
-           {children}
+          <Navbar />
+          {children}
         </CivicAuthProvider>
       </body>
     </html>
