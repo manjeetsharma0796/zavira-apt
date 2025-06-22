@@ -1,3 +1,5 @@
+"use client";
+
 import { UserButton } from "@civic/auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
