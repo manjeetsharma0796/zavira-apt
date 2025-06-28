@@ -9,6 +9,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/app/hooks/use-toast"
 import { Upload, Calendar, X, Check, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { ZAVIRA_ABI } from "@/app/utils/zavira";
+import { useWalletClient } from "@thalalabs/surf/hooks";
+import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import { aptosClient } from "@/app/utils/aptosClient"
 
 interface FormData {
   city: string
@@ -160,6 +164,8 @@ export default function ImageUploadForm() {
     }
   }
 
+
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     const files = Array.from(e.dataTransfer.files)
@@ -188,6 +194,38 @@ export default function ImageUploadForm() {
       fileInputRef.current.value = ""
     }
   }
+
+  const { client } = useWalletClient();
+  const { account, connected, disconnect, wallet } = useWallet();
+
+  const handleMint = async () => {
+
+    if (!account || !client) {
+      return;
+    }
+
+    try {
+      const committedTransaction = await client.useABI(ZAVIRA_ABI).transfer({
+        type_arguments: [],
+        arguments: ["0x5a5d125b5d1c3b57cc8b0901196139bff53c53d7d27dc8c27edea4190fa7f381", 100000000],
+      });
+      const executedTransaction = await aptosClient().waitForTransaction({
+        transactionHash: committedTransaction.hash,
+      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["message-content"],
+      // });
+      toast({
+        title: "Success",
+        description: `Transaction succeeded, hash: ${executedTransaction.hash}`,
+      });
+      // alert('Withdraw your earned QF coins!');
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -232,6 +270,8 @@ export default function ImageUploadForm() {
       })
       const data = await response.json()
       console.log("/ai API response:", data)
+
+      handleMint()
 
       toast({
         title: "Form submitted successfully!",
